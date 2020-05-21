@@ -3,7 +3,13 @@ numInd Function
 
 #generates genotype and phenotype data
 numInd.function <- function(var, da, IAF) {
+  
+  ### Generates genotype and phenotype data based on genetic inputs of QTL variance(var), the dominance additivity(da), and the increaser
+  ### allele frequency(IAF)
+  
   #number of indiviuals is decided by the increaser allele frequency
+  #NAF = null increaser frequency
+  NAF = 1 - IAF
   pq2 = (2*IAF*NAF) 
   HWMin = min(IAF^2, pq2, NAF^2)
   numInd = max((10/HWMin), 1000)
