@@ -25,5 +25,6 @@ expected.mat <- matrix(c((control.total*g0.total)/actual.total,
 
 #Chi squared
 chi.gof = (actual.mat - expected.mat)^2 / expected.mat
-gof.pval = 1 - pchisq(sum(chi.gof), df = 2)
+df = (nrow(expected.mat) - 1)*(ncol(expected.mat) - 1)
+gof.pval = 1 - pchisq(sum(chi.gof), df)
 print(gof.pval)
