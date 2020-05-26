@@ -77,17 +77,23 @@ poke_boxplot <- ggplot(data = pokemon, aes(x = weight_bin, y = combat_power)) +
 #Some pokemons have a unique fast_attack (not shared by any other pokemon). 
 #How many pokemons and which pokemons have a unique fast_attack?
 
+
 unique_attack <- pokemon %>%
+  #group by their attacks
   group_by(fast_attack) %>%
+  #tally and select those who have a unique fast attack
   tally %>%
   filter(n == 1) %>%
+  #pull the name of the fast attack
   pull(fast_attack)
 
+#find the position in the dataset where those unique attacks are 
 poke1 = which(pokemon$fast_attack == unique_attack[1])
 poke2 = which(pokemon$fast_attack == unique_attack[2])
 poke3 = which(pokemon$fast_attack == unique_attack[3])
 poke4 = which(pokemon$fast_attack == unique_attack[4])
 
+#print the line for those pokemon with unique attacks
 pokemon[poke1,]
 pokemon[poke2,]
 pokemon[poke3,]
