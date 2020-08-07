@@ -7,7 +7,7 @@ numInd_function, BIC_Calculations, HWE_checker, and chisq_gof, come from my rese
 
 We began by simulating genotype and phenotype data using the numInd_function. It  simualtes three three normal distributions laid over one another under the Fisher-Falconer Model. The data is then combined into a larger dataset where it is analyzed for significant differences between the genotypic means. 
 
-Some of the data analysis done includes the HWE_checker. This function checks that the data follows Hardy-Weinberg Equilibrium using the Chi-Square Test for Independence. If more than 5% of replicates fail this test, then the data is re-simulated. Next an ANOVA is run for significance. If the data fails and is significant, p-value counters are logged. The counters are then used to create a binomial confidence interval indicating the true power of the sample.
+Next, the FisherFalconerPowerCalculator analyzes the data for significant differences between the genotypic means. Some of the data analysis done includes the HWE_checker. This function checks that the data follows Hardy-Weinberg Equilibrium using the Chi-Square Test for Independence. If more than 5% of replicates fail this test, then the data is re-simulated. Next an ANOVA is run for significance. If the data fails and is significant, p-value counters are logged. The counters are then used to create a binomial confidence interval indicating the true power of the sample.
 
 Our current work involves adding environmental effects of age and aneuploidy rate into a threshold-based model. We then hope to repeat the process and analyze which traits most significantly contribute to phenotype and to identify the best statistical method to model gene-environment interactions. 
 
