@@ -98,3 +98,114 @@ pokemon[poke1,]
 pokemon[poke2,]
 pokemon[poke3,]
 pokemon[poke4,]
+
+# create tis df of data with 0 and 1 as homozygous for a spot
+```{r}
+
+Acral_Optitype <- read_excel("Downloads/Acral_Optitype.xlsx")
+
+p1 <- data.frame(Acral_Optitype[1:34,])[c(-1,-3)]
+myCols <- colnames(p1)
+myCols[1] <- "Sample"
+
+p2 <- Acral_Optitype[35:52,][c(-2,-3)]
+
+colnames(p1) <- myCols
+colnames(p2) <- myCols
+
+
+t1 <- p1 %>%
+  filter(str_detect(p1$Sample, "tumour"))
+c1 <- p1 %>%
+  filter(str_detect(p1$Sample, "normal"))
+
+t2 <- p2 %>%
+  filter(str_detect(p2$Sample, "T"))
+
+c2 <- p2 %>%
+  filter(str_detect(p2$Sample, "C"))
+
+
+myTis <- rbind(t1, t2)
+myCel <- rbind(c1, c2)
+
+myTis
+myCel
+```
+
+# Tissue Plots
+```{r}
+# convert the data frame to a long format
+#mutate df so columns contain 0 (no homo), or 1(homo) for each allele
+
+tisDF <- myTis %>%
+  mutate(A_Homo = (A1 == A2)) %>%
+  mutate(B_Homo = (B1 == B2)) %>%
+  mutate(C_Homo = (C1 == C2))
+
+plotTis <- tisDF[c(1,10,11,12)]
+df_tis <- reshape2::melt(plotTis,na.rm=TRUE, id.vars="Sample")
+
+ggplot(df_tis, aes(x=Sample, y=as.numeric(value), fill=factor(variable))) + geom_col(na.rm=TRUE) + theme_classic() +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(title="HLA Homozygosity for Tis",  x="Samples", y="Count of Genes with HLA Homozygosity") 
+
+# create the stacked histogram using ggplot2
+ggplot(df_tis, aes(x=Sample, y=as.numeric(value))) + geom_col(na.rm=TRUE) + theme_classic() +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(title="HLA Homozygosity for Tis",  x="Samples", y="Count of Genes with HLA Homozygosity") 
+
+
+```
+
+
+```{r}
+
+# convert the data frame to a long format
+#mutate df so columns contain 0 (no homo), or 1(homo) for each allele
+
+celDF <- myCel %>%
+  mutate(A_Homo = (A1 == A2)) %>%
+  mutate(B_Homo = (B1 == B2)) %>%
+  mutate(C_Homo = (C1 == C2))
+
+
+celDF
+
+plotCel <- celDF[c(1,10,11,12)]
+df_cel <- reshape2::melt(plotCel,na.rm=TRUE, id.vars="Sample")
+
+ggplot(df_cel, aes(x=Sample, y=as.numeric(value), fill=factor(variable))) + geom_col(na.rm=TRUE) + theme_classic() +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(title="HLA Homozygosity for Normal",  x="Samples", y="Count of Genes with HLA Homozygosity") 
+
+# create the stacked histogram using ggplot2
+ggplot(df_cel, aes(x=Sample, y=as.numeric(value))) + geom_col(na.rm=TRUE) + theme_classic() +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(title="HLA Homozygosity for Normal",  x="Samples", y="Count of Genes with HLA Homozygosity") 
+
+
+```
+# Mutations - what genes are being mutated? What samples? 
+```{r}
+
+# convert the data frame to a long format
+#mutate df so columns contain 0 (no homo), or 1(homo) for each allele
+jointDF <- rbind(celDF, tisDF)
+mutDF = data.frame(c(0), nrow=1, ncol=4)
+
+ 
+for (i in 1:nrow(celDF)) {
+  
+  # 6 for 2 alleles for HLA-A, B, C
+  for (j in 2:7) {
+    
+    if (celDF[i,j] != tisDF[i,j]) {
+
+      print(paste0(celDF[i, 1], ": ",celDF[i,j], " -> ", tisDF[i,j]))
+      rowLen = nrow(mutDF) + 1
+      
+      print(rowLen)
+      mutDF[rowLen, 1] <- celDF[i,1]
+      mutDF[rowLen, 2] <- celDF[i,j]
+      mutDF[rowLen, 3] <- tisDF[i,j]
+    }
+  }
+}
+
+colnames(mutDF) <- c("Sample", "Normal", "Mutation")
+mutDF[-1,]
+
+```
