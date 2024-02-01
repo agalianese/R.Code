@@ -99,6 +99,10 @@ pokemon[poke2,]
 pokemon[poke3,]
 pokemon[poke4,]
 
+
+
+###### All R code from working at the Rabadan lab follows #########
+
 # create tis df of data with 0 and 1 as homozygous for a spot
 ```{r}
 
@@ -208,4 +212,40 @@ for (i in 1:nrow(celDF)) {
 colnames(mutDF) <- c("Sample", "Normal", "Mutation")
 mutDF[-1,]
 
+```
+
+#EC2 INSTANCE PLOTS 
+```{r}
+mj_inst <- data.frame(ec2_instance[9,])
+
+mj_inst[1,15] = 0
+mj_inst[1,16] = 0
+
+mj_inst[2,] <- colnames(mj_inst)
+myOut <- data.frame(t(mj_inst))
+myOut <- myOut[-1,]
+
+myOut$X1 <- as.numeric(as.character(myOut$X1))
+myOut$X2 <- factor(myOut$X2, levels = unique(myOut$X2[order(myOut$X1)]))
+
+p1 <- ggplot(myOut, aes(x = X2, y = X1)) +
+  geom_bar(stat = "identity", fill = "steelblue") +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(x="Lab Members", y="May / June Averaged Instance Cost") +
+  ggtitle("Bar Graph")
+```
+
+
+#EC2 OTHER PLOTS 
+```{r}
+other <- data.frame(ec2_other[9,])
+
+other[2,] <- colnames(other)
+
+myOther <- data.frame(t(other))
+
+myOther <- myOther[-1,]
+myOther$X1 <- as.numeric(as.character(myOther$X1))
+myOther$X2 <- factor(myOther$X2, levels = unique(myOther$X2[order(myOther$X1)]))
+
+p2 <- ggplot(myOther, aes(x = X2, y = X1)) +
+  geom_bar(stat = "identity", fill = "steelblue") +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(x="Lab Members", y="Cost ($)", title ="May / June Averaged Volume Cost per User")
 ```
