@@ -287,8 +287,6 @@ p2 <- ggplot(top10, aes(x = patientID, y = Organism_Name, fill = viral_abundance
   scale_fill_gradient(low = "blue", high = "red") +  # Customize gradient colors
   labs(x = "Patient ID", y = "Virus") +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5))
 
-
-  
     combined <- bind_rows(get(sotr1_DFs[i]), get(sotr2_DFs[i])) %>%
         filter(sseqid != "NC_001422.1") %>%
         distinct() %>%
@@ -316,5 +314,17 @@ p2 <- ggplot(top10, aes(x = patientID, y = Organism_Name, fill = viral_abundance
                 position = position_stack(vjust = 0.5),
                 size = 3)
   
-    fileName = paste0("/ag4555/cSCC/plots/", mySOTRpats[i], "_viral_abun_piechart.jpg")
-    ggsave(fileName, p1)
+fileName = paste0("/ag4555/cSCC/plots/", mySOTRpats[i], "_viral_abun_piechart.jpg"
+ggsave(fileName, p1)
+
+
+
+# combined bar and line chart - have to manually match different y axes
+ggplot(myHERK, aes(x = patientID)) +
+    geom_bar(aes(y = n), stat = "identity", fill = "blue") +
+    geom_text(aes(y = n, label = round(n, 1)), vjust = -0.5, color = "blue") + # Add labels
+    geom_line(aes(y = viral_abundance * 1000000, group = 1), color = "red") +
+    geom_text(aes(y = viral_abundance* 1000000, label = paste0(round(viral_abundance*100, 2), "%"), vjust = 0.5), color='red') + 
+    scale_y_continuous(
+        name = "Total Reads",
+        sec.axis = sec_axis(~./10000, name = "Relative Abundance (in %)"))
