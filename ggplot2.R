@@ -249,3 +249,72 @@ myOther$X2 <- factor(myOther$X2, levels = unique(myOther$X2[order(myOther$X1)]))
 p2 <- ggplot(myOther, aes(x = X2, y = X1)) +
   geom_bar(stat = "identity", fill = "steelblue") +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5)) + labs(x="Lab Members", y="Cost ($)", title ="May / June Averaged Volume Cost per User")
 ```
+
+
+
+# working bar chart w labels
+ggplot(myHERK, aes(x = patientID)) +
+    geom_bar(aes(y = n), stat = "identity", fill = "blue") +
+    geom_text(aes(y = n, label = round(n, 1)), vjust = -0.5, color = "blue") # Add labels
+
+
+
+#working line chart w labels
+ggplot(myHERK, aes(x = patientID)) +
+  geom_line(aes(y = viral_abundance, group = 1), color = "red") +
+  geom_text(aes(y = viral_abundance, label = paste0(round(viral_abundance*100, 2), "%"), vjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+#combined but incorrect y axis
+ggplot(myHERK, aes(x=patientID)) + geom_col(aes(y = n, group=2), color="red") +
+ geom_line(aes(y = viral_abundance * 1000000, group = 1), color = "blue") + geom_text(aes(y = viral_abundance * 1000000, label = paste0(round(viral_abundance * 100, 3), "%"), vjust = -1, color="blue"))  +   scale_y_continuous(
+    name = "Total Reads",
+#    limits = c(0, 60000), # Adjust the limits as needed
+    sec.axis = sec_axis(~./1000000000, name = "Relative Abundance")) 
+
+
+p1 <- ggplot(top10, aes(x = patientID, y = viral_abundance, fill = Organism_Name)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Stacked Bar Chart",
+       x = "Category",
+       y = "Value",
+       fill = "Variable") +
+  theme_minimal()  +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5))
+
+p2 <- ggplot(top10, aes(x = patientID, y = Organism_Name, fill = viral_abundance)) +
+  geom_tile() +
+  scale_fill_gradient(low = "blue", high = "red") +  # Customize gradient colors
+  labs(x = "Patient ID", y = "Virus") +  theme(axis.text.x = element_text(angle = 45, hjust = 1), plot.title = element_text(hjust = 0.5))
+
+
+  
+    combined <- bind_rows(get(sotr1_DFs[i]), get(sotr2_DFs[i])) %>%
+        filter(sseqid != "NC_001422.1") %>%
+        distinct() %>%
+        arrange(evalue) %>%
+        mutate("patientID" = mySOTRpats[i]) %>%
+        mutate(Accession = str_replace(sseqid, "\\.1$", ""))
+      
+  
+    test <- left_join(combined, mySeqs, by = join_by(Accession)) %>%
+        group_by(Organism_Name) %>%
+        tally() %>%
+        mutate(viral_abundance = n/nrow(combined)) %>%
+        arrange(desc(viral_abundance)) %>%
+        mutate(patientID=mySOTRpats[i])
+  
+    top10 <- test[1:10,]
+    top10$Organism_Name <- factor(top10$Organism_Name, levels = top10$Organism_Name[order(-top10$n)])
+    
+    p1 <- ggplot(top10, aes(x = "", y = n, fill = Organism_Name)) +
+      geom_bar(stat = "identity", width = 1) + 
+      coord_polar("y", start = 0) + 
+      theme_void() + 
+      ggtitle(paste0("Top 10 Viral Abundance of ", mySOTRpats[i])) +
+      geom_label_repel(aes(label = paste0(round(viral_abundance * 100, 2), "%")),
+                position = position_stack(vjust = 0.5),
+                size = 3)
+  
+    fileName = paste0("/ag4555/cSCC/plots/", mySOTRpats[i], "_viral_abun_piechart.jpg")
+    ggsave(fileName, p1)
