@@ -327,4 +327,19 @@ ggplot(myHERK, aes(x = patientID)) +
     geom_text(aes(y = viral_abundance* 1000000, label = paste0(round(viral_abundance*100, 2), "%"), vjust = 0.5), color='red') + 
     scale_y_continuous(
         name = "Total Reads",
-        sec.axis = sec_axis(~./10000, name = "Relative Abundance (in %)"))
+        sec.axis = sec_axis(~./10000, name = "Relative Abundance (in %)")
+    )
+#working line chart w labels
+ggplot(myHERK, aes(x = patientID)) +
+  geom_line(aes(y = viral_abundance, group = 1), color = "red") +
+  geom_text(aes(y = viral_abundance, label = paste0(round(viral_abundance*100, 2), "%"), vjust = 0.5)) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+#combined but incorrect y axis
+ggplot(myHERK, aes(x=patientID)) + geom_col(aes(y = n, group=2), color="red") +
+ geom_line(aes(y = viral_abundance * 1000000, group = 1), color = "blue") + geom_text(aes(y = viral_abundance * 1000000, label = paste0(round(viral_abundance * 100, 3), "%"), vjust = -1, color="blue"))  +   scale_y_continuous(
+    name = "Total Reads",
+#    limits = c(0, 60000), # Adjust the limits as needed
+    sec.axis = sec_axis(~./1000000000, name = "Relative Abundance"))
+              
